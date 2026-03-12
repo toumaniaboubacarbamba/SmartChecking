@@ -1,23 +1,34 @@
 import 'package:flutter/material.dart';
+import 'core/di/injection.dart';
+import 'core/theme/app_theme.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initDependencies();
+  runApp(const MainApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Smart Checking',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-        useMaterial3: true,
+      theme: AppTheme.light,
+      home: const Scaffold(
+        body: Center(
+          child: Text(
+            'Smart Checking',
+            style: TextStyle(
+              color: AppColors.primary,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
       ),
-      home: const Scaffold(body: Center(child: Text('Smart Checking!'))),
     );
   }
 }
