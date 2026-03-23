@@ -1,0 +1,76 @@
+name: smart_checking
+description: "A new Flutter project."
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # State management
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.8
+  
+  # HTTP
+  dio: ^5.9.2
+  
+  # Local storage
+  shared_preferences: ^2.5.4
+  
+  # Camera & OCR
+  camera: ^0.12.0+1
+  google_mlkit_text_recognition: ^0.15.1
+  image_picker: ^1.2.1
+  
+  # Export CSV
+  csv: ^8.0.0
+  path_provider: ^2.1.5
+  share_plus: ^12.0.1
+  
+  # Permissions
+  permission_handler: ^12.0.1
+  intl: ^0.20.2
+
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  
+  flutter_lints: ^5.0.0
+
+
+flutter:
+
+  
+  uses-material-design: true
+
+  
+  assets:
+    - assets/images/
+    - assets/fonts/
+
+  
+  fonts:
+    - family: Gotham
+      fonts:
+        - asset: assets/fonts/Gotham-Light.otf
+          weight: 300
+        - asset: assets/fonts/Gotham-Book.otf
+          weight: 400
+        - asset: assets/fonts/Gotham-Medium.otf
+          weight: 500
+        - asset: assets/fonts/Gotham-Bold.otf
+          weight: 700
+    - family: Somatic
+      fonts:
+        - asset: assets/fonts/SomaticRounded.otf
