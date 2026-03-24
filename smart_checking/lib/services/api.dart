@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:smart_checking/entities/visitor.dart';
 import 'package:smart_checking/models/errors.dart';
 import 'package:smart_checking/models/userModel.dart';
+import 'package:smart_checking/models/visitorModel.dart';
 
 class ApiService{
   final Dio _dio = Dio(BaseOptions(
@@ -42,12 +43,42 @@ class ApiService{
 
   // &&--VISITOR--&&
 
-  Future<List<Visitor>> getVisitors(String token) async {}
-
-  Future<Visitor> createVisitor(String token, VisitorModel visitor) async {
+  Future<List<Visitor>> getVisitors(String token) async {
+    try {
+      final response = await _dio.get('/visitors',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+      return (response.data as List)
+          .map((v) => VisitorModel.fromJson(v))
+          .toList();
+    } on DioException catch (e) {
+      throw NetworkException('Erreur réseau : ${e.message}');
+    }
   }
 
-  Future<Visitor> deleteVisitor(String token, VisitorId) async {
+  Future<Visitor> createVisitor(String token, VisitorModel visitor) async {
+    try {
+      final response = await _dio.post('/visitors',
+        data: visitor.toJson(),
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+      return VisitorModel.fromJson(response.data);
+    } on DioException catch (e) {
+      throw NetworkException('Erreur réseau : ${e.message}');
+    }
+  }
+
+
+  Future<void> deleteVisitor(String token, visitorId) async {
+    try{
+      await _dio.delete('/visitors/$visitorId',
+      options: Options(headers: {
+        'Authorization': 'Bearer $token',
+      }),
+      );
+    } on DioException catch (e) {
+      throw NetworkException('Erreur réseau : ${e.message}');
+    }
   }
 
 
