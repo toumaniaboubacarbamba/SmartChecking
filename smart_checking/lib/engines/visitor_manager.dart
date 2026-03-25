@@ -73,9 +73,24 @@ Future<bool> addVisitor(String token, VisitorModel visitor) async {
 }
 
 // Delete un visiteur par son id
-  Future<void> deleteVisitor(String token, String visitorId) async {
+  Future<bool> removeVisitor(String token, String visitorId) async {
     _setState(VisitorState.loading);
     _clearError();
+
+    try {
+      await _api.deleteVisitor(token, visitorId);
+      _visitors = _visitors.where((v) => v.id != visitorId).toList();
+      _setState(VisitorState.success);
+      return true;
+    } on AppException catch (e) {
+      _error = e;
+      _setState(VisitorState.error);
+      return false;
+    } catch (e) {
+      _error = AppException(e.toString());
+      _setState(VisitorState.error);
+      return false;
+    }
   }
 
 //Helpers locaux
