@@ -6,11 +6,11 @@ import 'package:smart_checking/services/storageService.dart';
 
 //Etats possibles de l'authentification
 enum AuthState{
-  idle,
-  loading,
-  authenticated,
-  unauthenticated,
-  error,
+  initial, //initialisation
+  loading, // Chargement login, logout...
+  authenticated, // Authentification réussie
+  unauthenticated, // Authentification déconnecté
+  error, // Erreur réseau ou login/mdp incorrect
 }
 
 //Gère l'état d'auth global de l'application
@@ -19,7 +19,7 @@ class AuthManager extends ChangeNotifier {
   final ApiService _api;
   final Storageservice _storage;
 
-  AuthState _state = AuthState.idle;
+  AuthState _state = AuthState.initial;
   Account? _currentAccount;
   AppException? _error;
 
