@@ -80,6 +80,7 @@ Future<bool> addVisitor(String token, VisitorModel visitor) async {
 
     try {
       await _api.deleteVisitor(token, visitorId);
+      // Mise à jour locale
       _visitors = _visitors.where((v) => v.id != visitorId).toList();
       _setState(VisitorState.success);
       return true;
