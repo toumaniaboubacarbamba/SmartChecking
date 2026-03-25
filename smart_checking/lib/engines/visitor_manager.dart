@@ -35,21 +35,22 @@ int get totalVisitors => _visitors.length;
 
 //Fetch
 //Chargement des données depuis le serveur
-Future<void> fetchVisitors(String token) async {
-  _setState(VisitorState.loading);
-  _clearError();
-  try{
-    final visitors = await _api.getVisitors(token);
-    _visitors = result;
-    _setState(VisitorState.loaded);
-  } on AppException catch (e) {
-    _error = e;
-    _setState(VisitorState.error);
-  } catch (e) {
-    _error = AppException(e.toString());
-    _setState(VisitorState.error);
+  Future<void> fetchVisitors(String token) async {
+    _setState(VisitorState.loading);
+    _clearError();
+
+    try {
+      final result = await _api.getVisitors(token);
+      _visitors = result;
+      _setState(VisitorState.loaded);
+    } on AppException catch (e) {
+      _error = e;
+      _setState(VisitorState.error);
+    } catch (e) {
+      _error = AppException(e.toString());
+      _setState(VisitorState.error);
+    }
   }
-}
 
 //Création d'un nouveau visiteur return true en cas de succès ou false...
 Future<bool> addVisitor(String token, VisitorModel visitor) async {
