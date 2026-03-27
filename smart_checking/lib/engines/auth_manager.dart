@@ -17,7 +17,7 @@ enum AuthState{
 //utilisé comme ChangeNotifier injecté en haut de l'arbre de widgets.
 class AuthManager extends ChangeNotifier {
   final ApiService _api;
-  final Storageservice _storage;
+  final StorageService _storage;
 
   AuthState _state = AuthState.initial;
   Account? _currentAccount;
@@ -25,7 +25,7 @@ class AuthManager extends ChangeNotifier {
 
   AuthManager({
     required ApiService api,
-    required Storageservice storage,
+    required StorageService storage,
   })  : _api = api,
         _storage = storage;
 

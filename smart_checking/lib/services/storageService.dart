@@ -1,10 +1,10 @@
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:smart_checking/entities/account.dart';
 import 'package:smart_checking/models/userModel.dart';
 
-class Storageservice {
+import '../entities/account.dart';
+
+class StorageService {
   static const _userKey = 'cached_user';
 
   Future<void> saveUser(Usermodel user) async {
@@ -22,10 +22,10 @@ class Storageservice {
   Future<void> clearUser() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_userKey);
+  }
 
-    Future<String?> getToken() async {
-      final user = await getUser();
-      return user?.token;
-    }
+  Future<String?> getToken() async {
+    final user = await getUser();
+    return user?.token;
   }
 }

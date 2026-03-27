@@ -15,18 +15,21 @@ return new class extends Migration
             $table->id();
             $table->string('first_name');
             $table->string('last_name');
-            $table->date('date_of_birth');
-            $table->string('document_type');
-            $table->string('document_number')->unique();
-            $table->string('nationality');
-            $table->date('document_expiry_date');
-            $table->string('photo_path')->nullable();
-            $table->string('qr_code')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
-            $table->text('notes')->nullable();
-            $table->boolean('is_blacklisted')->nullable();
-            $table->timestamps();
+            $table->enum('gender',['Masculin', 'Féminin']);
+            $table->string('visit_reason');
+            $table->string('card_type');
+            $table->string('visitor_type');
+            $table->string('photo_path')->nullable();
+            $table->string('entry_method');
+            $table->dateTime('entry_time');
+            $table->dateTime('exit_time')->nullable();
+            $table->integer('visitor_count')->default(1);
+            $table->string('company')->nullable();
+
+
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
         });
     }
 
