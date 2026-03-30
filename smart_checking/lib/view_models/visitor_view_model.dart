@@ -4,32 +4,26 @@ import 'package:smart_checking/engines/visitor_manager.dart';
 import 'package:smart_checking/entities/visitor.dart';
 import 'package:smart_checking/models/errors.dart';
 import 'package:smart_checking/models/visitorModel.dart';
+import 'package:smart_checking/services/api.dart';
 import 'package:smart_checking/services/ocr_service.dart';
 
-// États de l'OCR séparés de VisitorState
-// pour ne pas bloquer l'UI pendant le scan
 enum OcrState {
-  initial,  // Pas de scan en cours
-  scanning, // Scan OCR en cours
-  done,     // Scan terminé avec succès
-  error,    // Échec du scan
+  initial,
+  scanning,
+  done,
+  error,
 }
 
-// ViewModel principal des visiteurs.
-// Gère la liste, le formulaire d'ajout, le scan OCR et la recherche.
 class VisitorViewModel extends ChangeNotifier {
   final VisitorManager _visitorManager;
   final AuthManager _authManager;
   final OcrService _ocrService;
+  final ApiService _api; // ← ajout pour les exports
 
-  // État OCR
   OcrState _ocrState = OcrState.initial;
   Map<String, String?> _ocrResult = {};
-
-  //État recherche
   String _searchQuery = '';
 
-  //Champs formulaire ajout visiteur
   String _lastName = '';
   String _firstName = '';
   String _email = '';
@@ -43,40 +37,46 @@ class VisitorViewModel extends ChangeNotifier {
   String? _company;
   int _visitorCount = 1;
 
+  // Erreur locale pour les exports
+  AppException? _exportError;
+
   VisitorViewModel({
     required VisitorManager visitorManager,
     required AuthManager authManager,
     required OcrService ocrService,
+    required ApiService api, // ← ajout
   })  : _visitorManager = visitorManager,
         _authManager = authManager,
-        _ocrService = ocrService {
+        _ocrService = ocrService,
+        _api = api {
     _visitorManager.addListener(_onVisitorChanged);
   }
 
-  //Getters état liste
+  // ── Getters état liste ────────────────────────────────────────────────────
 
   VisitorState get visitorState => _visitorManager.state;
   bool get isLoading => _visitorManager.isLoading;
-  AppException? get error => _visitorManager.error;
   int get totalVisitors => _visitorManager.totalVisitors;
 
-  // Liste filtrée selon la recherche en cours
+  // On expose l'erreur du manager OU l'erreur export locale
+  AppException? get error => _visitorManager.error ?? _exportError;
+
   List<Visitor> get visitors {
     if (_searchQuery.trim().isEmpty) return _visitorManager.visitors;
     return _visitorManager.search(_searchQuery);
   }
 
-  //Getters OCR
+  // ── Getters OCR ───────────────────────────────────────────────────────────
 
   OcrState get ocrState => _ocrState;
   bool get isScanning => _ocrState == OcrState.scanning;
   Map<String, String?> get ocrResult => _ocrResult;
 
-  //Getters recherche
+  // ── Getters recherche ─────────────────────────────────────────────────────
 
   String get searchQuery => _searchQuery;
 
-  // Getters formulaire
+  // ── Getters formulaire ────────────────────────────────────────────────────
 
   String get lastName => _lastName;
   String get firstName => _firstName;
@@ -91,46 +91,37 @@ class VisitorViewModel extends ChangeNotifier {
   String? get company => _company;
   int get visitorCount => _visitorCount;
 
-  // Formulaire valide si les champs obligatoires sont remplis
   bool get isFormValid =>
       _lastName.trim().isNotEmpty &&
-          _firstName.trim().isNotEmpty &&
-          _gender.isNotEmpty &&
-          _visitReason.trim().isNotEmpty &&
-          _cardType.isNotEmpty &&
-          _visitorType.isNotEmpty &&
-          _entryMethod.isNotEmpty;
+      _firstName.trim().isNotEmpty &&
+      _gender.isNotEmpty &&
+      _visitReason.trim().isNotEmpty &&
+      _cardType.isNotEmpty &&
+      _visitorType.isNotEmpty &&
+      _entryMethod.isNotEmpty;
 
-  // Setters formulaire
+  // ── Setters formulaire ────────────────────────────────────────────────────
 
-  void setLastName(String v) { _lastName = v; notifyListeners(); }
-  void setFirstName(String v) { _firstName = v; notifyListeners(); }
-  void setEmail(String v) { _email = v; notifyListeners(); }
-  void setPhone(String v) { _phone = v; notifyListeners(); }
-  void setGender(String v) { _gender = v; notifyListeners(); }
-  void setVisitReason(String v) { _visitReason = v; notifyListeners(); }
-  void setCardType(String v) { _cardType = v; notifyListeners(); }
-  void setVisitorType(String v) { _visitorType = v; notifyListeners(); }
-  void setEntryMethod(String v) { _entryMethod = v; notifyListeners(); }
-  void setPhotoPath(String? v) { _photoPath = v; notifyListeners(); }
-  void setCompany(String? v) { _company = v; notifyListeners(); }
-  void setVisitorCount(int v) { _visitorCount = v; notifyListeners(); }
+  void setLastName(String v)      { _lastName = v;    notifyListeners(); }
+  void setFirstName(String v)     { _firstName = v;   notifyListeners(); }
+  void setEmail(String v)         { _email = v;        notifyListeners(); }
+  void setPhone(String v)         { _phone = v;        notifyListeners(); }
+  void setGender(String v)        { _gender = v;       notifyListeners(); }
+  void setVisitReason(String v)   { _visitReason = v;  notifyListeners(); }
+  void setCardType(String v)      { _cardType = v;     notifyListeners(); }
+  void setVisitorType(String v)   { _visitorType = v;  notifyListeners(); }
+  void setEntryMethod(String v)   { _entryMethod = v;  notifyListeners(); }
+  void setPhotoPath(String? v)    { _photoPath = v;    notifyListeners(); }
+  void setCompany(String? v)      { _company = v;      notifyListeners(); }
+  void setVisitorCount(int v)     { _visitorCount = v; notifyListeners(); }
 
-  //Recherche
+  // ── Recherche ─────────────────────────────────────────────────────────────
 
-  void setSearchQuery(String query) {
-    _searchQuery = query;
-    notifyListeners();
-  }
+  void setSearchQuery(String query) { _searchQuery = query; notifyListeners(); }
+  void clearSearch()                { _searchQuery = '';    notifyListeners(); }
 
-  void clearSearch() {
-    _searchQuery = '';
-    notifyListeners();
-  }
+  // ── OCR ───────────────────────────────────────────────────────────────────
 
-  //OCR
-
-  // Scanne une image et remplit automatiquement le formulaire.
   Future<void> scanDocument(String imagePath) async {
     _ocrState = OcrState.scanning;
     _ocrResult = {};
@@ -139,12 +130,9 @@ class VisitorViewModel extends ChangeNotifier {
     try {
       final result = await _ocrService.extractFromImage(imagePath);
       _ocrResult = result;
-
-      // Pré-remplissage automatique du formulaire
-      if (result['lastName'] != null) _lastName = result['lastName']!;
+      if (result['lastName'] != null)  _lastName  = result['lastName']!;
       if (result['firstName'] != null) _firstName = result['firstName']!;
-      if (result['gender'] != null) _gender = result['gender']!;
-
+      if (result['gender'] != null)    _gender    = result['gender']!;
       _entryMethod = 'Scan ID';
       _ocrState = OcrState.done;
     } catch (e) {
@@ -160,19 +148,16 @@ class VisitorViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  //CRUD
+  // ── CRUD ──────────────────────────────────────────────────────────────────
 
-  //Charge la liste des visiteurs
   Future<void> fetchVisitors() async {
     final token = _authManager.currentAccount?.token;
     if (token == null) return;
     await _visitorManager.fetchVisitors(token);
   }
 
-  // Crée un visiteur depuis les champs du formulaire retourne `true` si succès.
   Future<bool> submitVisitor() async {
     if (!isFormValid) return false;
-
     final token = _authManager.currentAccount?.token;
     if (token == null) return false;
 
@@ -198,17 +183,43 @@ class VisitorViewModel extends ChangeNotifier {
     return success;
   }
 
-  // Supprime un visiteur par son id.
   Future<bool> deleteVisitor(String visitorId) async {
     final token = _authManager.currentAccount?.token;
     if (token == null) return false;
     return _visitorManager.removeVisitor(token, visitorId);
   }
 
-  // Retrouve un visiteur dans la liste locale.
   Visitor? getVisitorById(String id) => _visitorManager.findById(id);
 
-  //Reset formulaire
+  // ── Export ────────────────────────────────────────────────────────────────
+
+  Future<String?> exportCsv(List<String> ids) async {
+    final token = _authManager.currentAccount?.token;
+    if (token == null) return null;
+    try {
+      _exportError = null;
+      return await _api.exportCsv(token, ids);
+    } on AppException catch (e) {
+      _exportError = e;
+      notifyListeners();
+      return null;
+    }
+  }
+
+  Future<String?> exportPdf(List<String> ids) async {
+    final token = _authManager.currentAccount?.token;
+    if (token == null) return null;
+    try {
+      _exportError = null;
+      return await _api.exportPdf(token, ids);
+    } on AppException catch (e) {
+      _exportError = e;
+      notifyListeners();
+      return null;
+    }
+  }
+
+  // ── Reset formulaire ──────────────────────────────────────────────────────
 
   void resetForm() {
     _lastName = '';
@@ -227,10 +238,9 @@ class VisitorViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ── Propagation ───────────────────────────────────────────────────────────
 
-  void _onVisitorChanged() {
-    notifyListeners();
-  }
+  void _onVisitorChanged() { notifyListeners(); }
 
   @override
   void dispose() {

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:smart_checking/engines/auth_manager.dart';
+import 'package:smart_checking/entities/account.dart';
 
 // ViewModel de l'authentification Fait le pont entre AuthManager et les pages Login/Splash.
 class AuthViewModel extends ChangeNotifier {
@@ -21,6 +22,7 @@ class AuthViewModel extends ChangeNotifier {
   bool get isLoading => _authManager.isLoading;
   bool get isAuthenticated => _authManager.isAuthenticated;
   String? get errorMessage => _authManager.error?.message;
+  Account? get currentAccount => _authManager.currentAccount;
 
   // Getters formulaire
 

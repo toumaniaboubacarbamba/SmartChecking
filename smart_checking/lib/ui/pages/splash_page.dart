@@ -4,6 +4,7 @@ import 'package:smart_checking/view_models/auth_view_model.dart';
 import 'package:smart_checking/engines/auth_manager.dart';
 import 'package:smart_checking/ui/pages/login_page.dart';
 import 'package:smart_checking/ui/pages/home_page.dart';
+import 'package:smart_checking/ui/pages/onboarding_page.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -53,8 +54,9 @@ class _SplashPageState extends State<SplashPage>
       );
     } else if (state == AuthState.unauthenticated ||
         state == AuthState.error) {
+      // On redirige vers l'Onboarding pour la première fois ou Login
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const LoginPage()),
+        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
       );
     }
   }
@@ -81,25 +83,27 @@ class _SplashPageState extends State<SplashPage>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Logo
+                    // Logo SmartChecking
                     Container(
-                      width: 90,
-                      height: 90,
+                      width: 100,
+                      height: 100,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF4B4B4B),
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF2ECC71).withOpacity(0.4),
-                            blurRadius: 32,
-                            spreadRadius: 4,
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            spreadRadius: 2,
                           ),
                         ],
                       ),
-                      child: const Icon(
-                        Icons.verified_user_rounded,
-                        color: Colors.white,
-                        size: 48,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Image.asset(
+                          'assets/logo-smart-cheking.png',
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -118,7 +122,7 @@ class _SplashPageState extends State<SplashPage>
                     Text(
                       'Gestion intelligente des visiteurs',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.75),
+                        color: Colors.white.withOpacity(0.85),
                         fontSize: 13,
                         letterSpacing: 0.3,
                       ),
@@ -127,12 +131,12 @@ class _SplashPageState extends State<SplashPage>
 
                     // Indicateur de chargement
                     if (vm.isLoading)
-                      SizedBox(
+                      const SizedBox(
                         width: 24,
                         height: 24,
                         child: CircularProgressIndicator(
                           strokeWidth: 2.5,
-                          color: const Color(0xFF2ECC71).withOpacity(0.8),
+                          color: Colors.white,
                         ),
                       ),
                   ],

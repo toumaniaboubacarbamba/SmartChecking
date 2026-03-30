@@ -18,6 +18,8 @@ class AuthController extends Controller
 
         //if user exists
         $user = User::where('email', $request->email)->first();
+
+
         if(!$user || !Hash::check($request->password, $user->password)){
             return response()->json([
                 'message' => 'Email ou mot de passe incorrect'

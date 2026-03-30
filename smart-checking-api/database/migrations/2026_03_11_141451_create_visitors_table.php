@@ -27,9 +27,8 @@ return new class extends Migration
             $table->dateTime('exit_time')->nullable();
             $table->integer('visitor_count')->default(1);
             $table->string('company')->nullable();
-
-
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->timestamps();
         });
     }
 

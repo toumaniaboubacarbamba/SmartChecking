@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Visitor;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class VisitorController extends Controller
@@ -20,14 +21,14 @@ class VisitorController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
         //
         $data = $request->validate([
             'last_name' => 'required|string',
             'first_name' => 'required|string',
             'email'=> 'nullable|email',
-            'gender' => 'required|in:Masculin, Féminin',
+            'gender' => ['required', 'string', Rule::in(['Masculin', 'Féminin', 'masculin', 'féminin', 'Male', 'Female'])],
             'visit_reason' => 'required|string',
             'card_type' => 'required|string',
             'visitor_type' => 'required|string',
